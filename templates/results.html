@@ -1,0 +1,13 @@
+<h1>Results</h1>
+
+<h3>{{numFound}} results found!</p>
+
+<div>
+{% for doc in docs %}
+  <div style="border:2px solid black;padding:0 20px 0 20px;">
+  {% for key, value in doc.items() %}
+    <p style="font-size: 14px;">{{key}}: {{value}}</p>
+  {% endfor %}
+  </div><br>
+{% endfor %}
+</div>
