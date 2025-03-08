@@ -1,10 +1,10 @@
 from flask import Flask, render_template, request, jsonify
 import requests
-import sqlite3
 import os
-import pandas as pd
+from flask_dropzone import Dropzone
 
 app = Flask(__name__)
+dropzone = Dropzone(app)
 
 @app.route('/')
 def index():
@@ -26,24 +26,51 @@ def search():
             fullvarstring += f"q={q}"
         else:
             fullvarstring += f"&fq={q}"
-        print(fullvarstring)
+        if request.form.get("start"):
+            start = request.form.get("start")
+            fullvarstring+= f"&start={start}"
+        fullvarstring+= "&q.op=AND"
+    print(f"lol:{fullvarstring}")
     r = requests.get(f"http://127.0.0.1:8983/solr/test3/select?{fullvarstring}").json()
-    
+    start = r['response']['start']
     numFound = r['response']['numFound']
-    
     docs = r['response']['docs']
     
-    #print(r.response.docs)
-    return render_template('results.html', numFound=numFound, docs=docs)
-    
+    blur = False if (request.form.get("blur") is None) else True
+    return render_template('results.html',numFound=numFound, docs=docs, blur=blur,start=start, fullvarstring=fullvarstring)
+
 @app.route('/api/fieldnames')
 def fieldnames():
-    r = requests.get(f"http://127.0.0.1:7574/solr/test3/select?q=*:*&wt=csv&rows=0&facet")
-    return r.content.decode().strip().split(",")
+    r = requests.get(f"http://127.0.0.1:8983/solr/test3/select?q=*:*&wt=csv&rows=0&facet")
+    if r.status_code == 200:
+        return r.content.decode().strip().split(",")
+    else:
+        return []
 
 
+@app.route('/upload', methods=['POST', 'GET'])
+def upload():
+    if request.method == "POST":
+        try:
+            file = request.files['file']
+            file.save(os.path.join('/tmp',file.filename))
+            return render_template('upload.html', status="Success")
+        except:
+            return render_template('upload.html', status="Failed")
+    else:
+        return render_template('upload.html')
+
+def get_url():
+    try:
+        with open("url.txt", "r") as f:
+            line = f.readline()
+        return line
+    except:
+        return None
 
 def handle_query(header, match, string): #TO MOVE TO A SEPERATE PY FILE LATER
+    if (header == "email"):
+        header = "email_str" #fix for text vs str search
     if (match == "is"):
         return f"{header}:{string}"
     elif (match == "contains"):
@@ -52,6 +79,8 @@ def handle_query(header, match, string): #TO MOVE TO A SEPERATE PY FILE LATER
         return f"{header}:{string}*"
     elif (match == "ends with"):
         return f"{header}:*{string}"
+    elif (match == "regex"):
+        return f"{header}:/{string}/"
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,13 +1,26 @@
-<h1>Results</h1>
 
-<h3>{{numFound}} results found!</p>
+<body style="margin:0 500px;">
 
-<div>
-{% for doc in docs %}
-  <div style="border:2px solid black;padding:0 20px 0 20px;">
-  {% for key, value in doc.items() %}
-    <p style="font-size: 14px;">{{key}}: {{value}}</p>
+  {% include 'nav.html' %}
+  <h1>Results</h1>
+
+  <h3>{{numFound}} result(s) found!</p>
+  <h3>Showing results {{start}} - {{start+docs|length}}</p>  
+  <div>
+  {% for doc in docs %}
+    <div style="border:2px solid black;padding:0 20px 0 20px;">
+    {% for key, value in doc.items() %}
+      <p style="font-size: 14px;">
+        {{key}}:
+        {% if blur %}
+          {% set value = value | string %}
+          <span>{{value[:7]}}</span><span style="filter:blur(5px);">{{value[7:]}}</span>
+        {% else %}
+          <span>{{value}}</span>
+        {% endif %}
+      </p>
+    {% endfor %}
+    </div><br>
   {% endfor %}
-  </div><br>
-{% endfor %}
-</div>
+  </div>
+</body>

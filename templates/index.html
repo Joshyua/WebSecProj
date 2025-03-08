@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Security Breach Check</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0f172a;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: #1e293b;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+        h1 {
+            color: #38bdf8;
+        }
+        input, button {
+            padding: 12px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #38bdf8;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0284c7;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #38bdf8;
+            color: white;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Have You Been Breached?</h1>
+        <p>Check if your email or personal data has been compromised in a data breach.</p>
+
+        <form id="upload-form" enctype="multipart/form-data">
+            <input type="file" id="file-input" name="file" required>
+            <div class="button-group">
+                <button type="submit">Upload</button>
+                <button type="button" id="delete-db">Delete Database</button>
+            </div>
+        </form>
+
+        <input type="text" id="search-box" placeholder="Enter email to check...">
+        <button id="show-all">Show All Breaches</button>
+
+        <table id="results-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+            <tbody id="results"></tbody>
+        </table>
+    </div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let formData = new FormData();
+            formData.append('file', document.getElementById('file-input').files[0]);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json())
+              .then(data => alert(data.success || data.error));
+        });
+
+        document.getElementById('delete-db').addEventListener('click', function() {
+            if (confirm("Are you sure you want to delete all data? This action cannot be undone.")) {
+                fetch('/delete', {
+                    method: 'POST'
+                }).then(response => response.json())
+                  .then(data => alert(data.success || data.error));
+            }
+        });
+
+        function fetchData(query = '') {
+            fetch(`/search?q=${query}`)
+                .then(response => response.json())
+                .then(results => {
+                    let tableBody = document.getElementById('results');
+                    tableBody.innerHTML = '';
+                    results.forEach(data => {
+                        let parsedData = JSON.parse(data.replace(/'/g, '"'));
+                        let row = `<tr>
+                            <td>${parsedData.id}</td>
+                            <td>${parsedData.name}</td>
+                            <td>${parsedData.email}</td>
+                            <td>${parsedData.phone}</td>
+                            <td>${parsedData.address}</td>
+                        </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+                });
+        }
+
+        document.getElementById('search-box').addEventListener('input', function() {
+            fetchData(this.value);
+        });
+
+        document.getElementById('show-all').addEventListener('click', function() {
+            fetchData();
+        });
+    </script>
+</body>
+</html>
