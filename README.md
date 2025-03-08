@@ -36,6 +36,7 @@ This application uses Flask to search data indexed in an Apache Solr server. Use
    
        cd solr-<version>
        bin/solr start -e cloud
+   accept all the default options
 ---
 
 ## 4. Project Setup
