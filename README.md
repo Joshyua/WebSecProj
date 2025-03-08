@@ -75,6 +75,7 @@ This application uses Flask to search data indexed in an Apache Solr server. Use
 3. **Launch the Flask App**
    ```bash
    python main.py
+Make sure solr is already running as python will perform a startup check on solr's collection only once
 Flask will start on http://127.0.0.1:5000 by default.
 
 ## 6. Using the Search Page
