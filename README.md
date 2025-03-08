@@ -35,14 +35,8 @@ This application uses Flask to search data indexed in an Apache Solr server. Use
    Navigate into the extracted Solr folder and start Solr on the default port (8983):
    
        cd solr-<version>
-       bin/solr start
-   Verify Solr is running by opening your browser to http://127.0.0.1:8983/solr/.
-
-4. **Create the "fortnite" core**
-   In the same folder where Solr is extracted:
-   ```bash
-   bin/solr create -c fortnite
-  This creates a new Solr core named fortnite, which the Flask app will query.
+       bin/solr start -e cloud
+---
 
 ## 4. Project Setup
 
@@ -66,27 +60,13 @@ This application uses Flask to search data indexed in an Apache Solr server. Use
    pip install -r requirements.txt
   This will install Flask, requests, pandas, and other libraries needed to run the application.
 
-## 5. Configuration
-
-Inside **`main.py`**, ensure the Solr URLs match where you have Solr running. For example:
-
-    ```python
-    def fieldnames():
-        r = requests.get("http://127.0.0.1:8983/solr/fortnite/select?q=*:*&wt=csv&rows=0&facet")
-        return r.content.decode().strip().split(",")
-If you’re running Solr on a different port or with a different core name, edit the URLs accordingly.
-
-## 6. Running the Application
+## 5. Running the Application
 
 1. **Start Solr (if it’s not already running)**
    ```bash
-   bin/solr start
+   bin/solr start -e cloud
    ```
-If you installed Solr as a service, you can use:
-  ```bash
-  sudo service solr start
- ```
-
+   
 2. **Activate the Python Virtual Environment (if used)**
    ```bash
    cd ~/Desktop/WebSecProj-ui
@@ -97,7 +77,7 @@ If you installed Solr as a service, you can use:
    python main.py
 Flask will start on http://127.0.0.1:5000 by default.
 
-## 7. Using the Search Page
+## 6. Using the Search Page
 
 1. **Open a Web Browser**  
    Go to [http://127.0.0.1:5000](http://127.0.0.1:5000).
@@ -116,29 +96,12 @@ Flask will start on http://127.0.0.1:5000 by default.
 
 ---
 
-## 8. Troubleshooting
-
-- **Connection Refused (port 7574)**  
-  If you see an error like:
-```bash
-requests.exceptions.ConnectionError: HTTPConnectionPool(host='127.0.0.1', port=7574)...
-```
-That means the code is pointing to the wrong port for Solr. Update it to **8983** or run Solr on **7574** by specifying `-p 7574` when starting Solr.
-
-## 9. Stopping the Application
+## 7. Stopping the Application
 
 1. **Stop Flask**  
    Press **CTRL + C** in the terminal where `python main.py` is running.
 
-2. **Deactivate Virtual Environment (optional)**  
-   ```bash
-   deactivate
-
-3. **Stop Solr (if needed)**
+2. **Stop Solr (if needed)**
     ```bash
     bin/solr stop
     ```
-    or
-   ```bash
-   sudo service solr stop
-   ```
