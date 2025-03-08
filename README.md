@@ -38,18 +38,18 @@ This application uses Flask to search data indexed in an Apache Solr server. Use
        bin/solr start
    Verify Solr is running by opening your browser to http://127.0.0.1:8983/solr/.
 
-4. **Create the "test3" core**
+4. **Create the "fortnite" core**
    In the same folder where Solr is extracted:
    ```bash
-   bin/solr create -c test3
-  This creates a new Solr core named test3, which the Flask app will query.
+   bin/solr create -c fortnite
+  This creates a new Solr core named fortnite, which the Flask app will query.
 
 ## 4. Project Setup
 
 1. **Obtain the Project Files**  
    - Clone this repository (which contains the following files) into a local folder on your machine, for example `WebSecProj`:
-     - `excelsior.py`
-     - `drain.html`
+     - `main.py`
+     - `index.html`
      - `results.html`
      - `requirements.txt`
      - `README.md`
@@ -68,11 +68,11 @@ This application uses Flask to search data indexed in an Apache Solr server. Use
 
 ## 5. Configuration
 
-Inside **`excelsior.py`**, ensure the Solr URLs match where you have Solr running. For example:
+Inside **`main.py`**, ensure the Solr URLs match where you have Solr running. For example:
 
     ```python
     def fieldnames():
-        r = requests.get("http://127.0.0.1:8983/solr/test3/select?q=*:*&wt=csv&rows=0&facet")
+        r = requests.get("http://127.0.0.1:8983/solr/fortnite/select?q=*:*&wt=csv&rows=0&facet")
         return r.content.decode().strip().split(",")
 If you’re running Solr on a different port or with a different core name, edit the URLs accordingly.
 
@@ -94,7 +94,7 @@ If you installed Solr as a service, you can use:
 
 3. **Launch the Flask App**
    ```bash
-   python excelsior.py
+   python main.py
 Flask will start on http://127.0.0.1:5000 by default.
 
 ## 7. Using the Search Page
