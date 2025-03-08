@@ -9,7 +9,7 @@ dropzone = Dropzone(app)
 @app.route('/')
 def index():
     headers = fieldnames()
-    return render_template('drain.html', headers=headers)
+    return render_template('index.html', headers=headers)
 
 
 @app.route('/search', methods=['POST'])
@@ -31,7 +31,7 @@ def search():
             fullvarstring+= f"&start={start}"
         fullvarstring+= "&q.op=AND"
     print(f"lol:{fullvarstring}")
-    r = requests.get(f"http://127.0.0.1:8983/solr/test3/select?{fullvarstring}").json()
+    r = requests.get(f"http://127.0.0.1:8983/solr/fortnite/select?{fullvarstring}").json()
     start = r['response']['start']
     numFound = r['response']['numFound']
     docs = r['response']['docs']
@@ -41,11 +41,8 @@ def search():
 
 @app.route('/api/fieldnames')
 def fieldnames():
-    r = requests.get(f"http://127.0.0.1:8983/solr/test3/select?q=*:*&wt=csv&rows=0&facet")
-    if r.status_code == 200:
-        return r.content.decode().strip().split(",")
-    else:
-        return []
+    r = requests.get(f"http://127.0.0.1:8983/solr/fortnite/select?q=*:*&wt=csv&rows=0&facet")
+    return r.content.decode().strip().split(",")
 
 
 @app.route('/upload', methods=['POST', 'GET'])
@@ -54,6 +51,7 @@ def upload():
         try:
             file = request.files['file']
             file.save(os.path.join('/tmp',file.filename))
+            #upload to solr
             return render_template('upload.html', status="Success")
         except:
             return render_template('upload.html', status="Failed")
