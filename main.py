@@ -2,9 +2,13 @@ from flask import Flask, render_template, request, jsonify
 import requests
 import os
 from flask_dropzone import Dropzone
+import json
 
 app = Flask(__name__)
 dropzone = Dropzone(app)
+r = requests.get(f"http://127.0.0.1:8983/api/c/fortnite")
+if (r.status_code != 200):
+    requests.get("http://127.0.0.1:8983/solr/admin/collections?action=CREATE&name=fortnite&numShards=2")
 
 @app.route('/')
 def index():
@@ -30,7 +34,6 @@ def search():
             start = request.form.get("start")
             fullvarstring+= f"&start={start}"
         fullvarstring+= "&q.op=AND"
-    print(f"lol:{fullvarstring}")
     r = requests.get(f"http://127.0.0.1:8983/solr/fortnite/select?{fullvarstring}").json()
     start = r['response']['start']
     numFound = r['response']['numFound']
@@ -51,9 +54,25 @@ def upload():
         try:
             file = request.files['file']
             file.save(os.path.join('/tmp',file.filename))
-            #upload to solr
-            return render_template('upload.html', status="Success")
-        except:
+            
+            with open(f"""/tmp/{file.filename}""","rb") as f:
+                res = requests.post(
+                    url='http://127.0.0.1:8983/api/c/fortnite/update/csv',
+                    headers = {'Content-type': 'application/csv'},
+                    params = {
+                        "commit": "true",
+                        "separator": ":",
+                        "header": "true"
+                    },
+                    data = f.read()
+                )
+                data = json.loads(res.text)
+                if data['error']:
+                    return render_template('upload.html', status="Success", warning=data['error']['msg'])
+                else:
+                    pass
+            return render_template('upload.html', status="Success", warning="warning")
+        except Exception as e:
             return render_template('upload.html', status="Failed")
     else:
         return render_template('upload.html')
