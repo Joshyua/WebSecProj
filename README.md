@@ -128,7 +128,7 @@ That means the code is pointing to the wrong port for Solr. Update it to **8983*
 ## 9. Stopping the Application
 
 1. **Stop Flask**  
-   Press **CTRL + C** in the terminal where `python excelsior.py` is running.
+   Press **CTRL + C** in the terminal where `python main.py` is running.
 
 2. **Deactivate Virtual Environment (optional)**  
    ```bash
