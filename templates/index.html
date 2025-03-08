@@ -1,0 +1,68 @@
+
+<body style="margin:0 500px;">
+
+{% include 'nav.html' %}
+
+
+  <form id="search" method="post" action="/search">
+    <label>Enter Query:</label><br>
+    
+    
+    <div id="allquery" style="display:inline-block;">
+    
+      <div id="singlequery1">
+        <select name="header1">
+          <option value="" selected disabled hidden>Select Field</option>
+          {% for header in headers %}
+          <option value={{header}}>{{header}}</option>
+          {% endfor %}
+        </select>
+        <select name="match1">
+          <option value="is" selected>is</option>
+          <option value="contains">contains</option>
+          <option value="starts with" >starts with</option>
+          <option value="ends with">ends with</option>
+          <option value="regex">regex</option>
+        </select>
+        <input type="text" value="" name="string1">
+        <input type="submit">
+        <input name="blur" type="checkbox">
+        <label>Mask Info?</label>
+      </div>
+    </div>
+  </form>
+
+  <button type="button" style="font-size: 50px; width:80px;" class="add" onclick="add()">+</button>
+  <button type="button" style="font-size: 50px; width:80px;" class="remove" onclick="remove()">-</button>
+  
+  
+</body>
+<script>
+
+var queryDOM = document.getElementById("allquery")
+var count = 2
+
+function add(){
+  const jango = document.getElementById("singlequery1")
+  var clone = jango.cloneNode(deep=true)
+  clone.removeChild(clone.lastElementChild)
+  clone.removeChild(clone.lastElementChild)
+  clone.removeChild(clone.lastElementChild)
+  clone.setAttribute('id', "singlequery"+count)
+  clone.firstElementChild.setAttribute("name", "header"+count)
+  clone.firstElementChild.nextElementSibling.setAttribute("name", "match"+count)
+  clone.lastElementChild.setAttribute("name", "string"+count)
+  queryDOM.appendChild(clone)
+  count++
+  console.log("added")
+}
+
+function remove(){
+  var gg = queryDOM.lastElementChild
+  if (gg.id != "singlequery1"){
+    queryDOM.removeChild(gg)
+    count--
+  }
+}
+</script>
+
